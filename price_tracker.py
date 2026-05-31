@@ -46,6 +46,8 @@ def check_brave_not_running():
             sys.exit(2)
     except FileNotFoundError:
         pass  # pgrep not available — proceed and let Playwright surface any lock error
+
+
 VENDORS_FILE = ROOT / "vendors.json"
 HISTORY_FILE = ROOT / "price_history.json"
 STATUS_FILE = ROOT / "status.json"
@@ -124,6 +126,21 @@ def _walk_jsonld_for_price(node):
     return None
 
 
+def wait_for_price_element(page, selectors, timeout_ms=10000):
+    """Wait for any CSS selector to appear in the DOM before extracting.
+
+    Retail pages that render prices via JS (e.g. Target/React) won't have the
+    price element present at domcontentloaded. Waiting here gives the page time
+    to render it. Silently continues on timeout — extraction will fail gracefully.
+    """
+    for selector in selectors or []:
+        try:
+            page.wait_for_selector(selector, timeout=timeout_ms, state="attached")
+            return  # one visible selector is enough
+        except Exception:
+            continue
+
+
 def extract_jsonld_price(page):
     """Try structured data first — most reliable on retail pages."""
     blocks = page.locator("script[type='application/ld+json']").all()
@@ -176,7 +193,9 @@ def build_error(stage, message, vendor, page=None, jsonld_present=None, raw_text
     if page is not None:
         try:
             err["page_title"] = page.title()
-            err["final_url"] = page.url
+            # On navigation failure page.url reflects the *previous* page — use the
+            # vendor's intended URL instead so the record is actually useful.
+            err["final_url"] = vendor["url"] if stage == "navigation" else page.url
         except Exception:
             pass
     return err
@@ -214,15 +233,24 @@ def process_vendor(page, product, unit_type, vendor, config, history):
         result["error"] = build_error("navigation", str(e), vendor, page)
         return result
 
+    # Give JS-rendered prices time to appear before extracting.
+    wait_for_price_element(page, vendor.get("selectors"))
+
     price, jsonld_present = extract_jsonld_price(page)
     raw_text = None
     if price is None:
         price, _matched, raw_text = extract_css_price(page, vendor.get("selectors"))
 
+    # A price of $0.00 is never valid for retail products — treat as extraction failure
+    # so the error is captured in status.json rather than silently written to history.
+    if price is not None and price <= 0:
+        raw_text = str(price)
+        price = None
+
     if price is None:
         if raw_text:
             stage = "parse"
-            message = "Matched element text did not normalize to a number"
+            message = "Matched element text did not normalize to a number" if raw_text != "0.0" else "Extracted price was $0.00 — selector matched wrong element"
         else:
             stage = "extraction"
             message = "No JSON-LD price and every CSS selector missed"
