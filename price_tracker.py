@@ -200,21 +200,53 @@ def append_history(history, result, timestamp):
 
 # --- terminal summary ------------------------------------------------------
 
+EXIT_MEANING = {
+    0: "all vendors succeeded",
+    1: "one or more fetch/parse failures",
+    2: "fatal error",
+}
+
+
+def _change_str(change_pct):
+    """Signed change with a direction arrow, e.g. '↓ -6.2%' or '— flat'."""
+    if change_pct is None:
+        return "— (no prior reading)"
+    if change_pct < 0:
+        return f"↓ {change_pct:+.2f}%"
+    if change_pct > 0:
+        return f"↑ {change_pct:+.2f}%"
+    return "— flat"
+
+
 def print_summary(results, exit_code):
+    """Human-readable summary — the primary surface. Self-sufficient: the user
+    should learn everything (prices, changes, alerts, failures) from here."""
+    print()
     for r in results:
-        mark = "OK  " if r["ok"] else "FAIL"
-        line = f"[{mark}] {r['product']} @ {r['vendor']}"
         if r["ok"]:
-            line += f": ${r['price']} ({r['price_per_base_unit']}/{r['unit_type']})"
-            if r["change_pct"] is not None:
-                line += f"  {r['change_pct']:+}%"
-            if r["alert"]:
-                line += "  DROP"
+            mark = "🔻" if r["alert"] else "🟢"
+            print(
+                f"{mark} {r['product']} @ {r['vendor']}: "
+                f"${r['price']:.2f}  "
+                f"(${r['price_per_base_unit']:.4f}/{r['unit_type']})  "
+                f"{_change_str(r['change_pct'])}"
+                + ("  ** PRICE DROP **" if r["alert"] else "")
+            )
         else:
-            line += f": {r['error']}"
-        print(line)
+            err = r["error"]
+            reason = err.get("message") if isinstance(err, dict) else err
+            print(f"🔴 {r['product']} @ {r['vendor']}: FAILED — {reason}")
+
     ok = sum(1 for r in results if r["ok"])
-    print(f"\n{ok}/{len(results)} ok — exit {exit_code}")
+    failed = len(results) - ok
+    alerts = [r for r in results if r.get("alert")]
+    print()
+    summary = f"{ok} ok, {failed} failed"
+    if alerts:
+        names = ", ".join(f"{a['product']} @ {a['vendor']}" for a in alerts)
+        summary += f" — {len(alerts)} price drop(s): {names}"
+    print(summary)
+    print(f"exit {exit_code} ({EXIT_MEANING.get(exit_code, 'unknown')})")
 
 
 # --- main ------------------------------------------------------------------
