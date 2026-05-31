@@ -1,0 +1,13 @@
+# Generated at runtime — local only, not committed
+price_history.json
+status.json
+
+# Dedicated Brave profile / browser user-data-dir (if ever placed in-repo)
+brave-profile/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
