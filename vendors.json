@@ -1,0 +1,30 @@
+{
+  "config": {
+    "brave_executable": "/Applications/Brave Browser.app/Contents/MacOS/Brave Browser",
+    "user_data_dir": "~/.price-tracker/brave-profile",
+    "profile_directory": "Default",
+    "headless": false,
+    "alert_threshold_pct": 5.0,
+    "nav_timeout_ms": 30000
+  },
+  "products": [
+    {
+      "name": "Example Sparkling Water",
+      "unit_type": "oz",
+      "vendors": [
+        {
+          "vendor": "ExampleMart",
+          "url": "https://example.com/REPLACE-WITH-REAL-PRODUCT-URL",
+          "enabled": true,
+          "package_count": 12,
+          "unit_size": 12,
+          "selectors": [
+            "[itemprop='price']",
+            ".price-now",
+            ".product-price"
+          ]
+        }
+      ]
+    }
+  ]
+}
