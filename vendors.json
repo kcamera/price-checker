@@ -5,7 +5,9 @@
     "profile_directory": "Default",
     "headless": false,
     "alert_threshold_pct": 5.0,
-    "nav_timeout_ms": 30000
+    "nav_timeout_ms": 30000,
+    "request_delay_ms": 2000,
+    "same_domain_delay_ms": 4000
   },
   "products": [
     {
@@ -54,8 +56,8 @@
           "package_count": 12,
           "unit_size": 12,
           "selectors": [
-            "[data-testid='price']",
             ".product__price",
+            "[data-testid='price']",
             ".pricingInfo__price"
           ]
         },
@@ -74,14 +76,15 @@
         {
           "vendor": "Walmart",
           "url": "https://www.walmart.com/ip/10291651",
-          "enabled": true,
+          "enabled": false,
           "package_count": 12,
           "unit_size": 12,
           "selectors": [
             "[itemprop='price']",
             ".price-characteristic",
             "[data-testid='price']"
-          ]
+          ],
+          "_note": "Disabled pending investigation of Playwright fingerprinting vs. Walmart bot detection. Re-enable after lockout clears."
         }
       ]
     },
@@ -119,8 +122,8 @@
           "package_count": 6,
           "unit_size": 16.9,
           "selectors": [
-            "[data-testid='price']",
             ".product__price",
+            "[data-testid='price']",
             ".pricingInfo__price"
           ]
         },
@@ -139,133 +142,15 @@
         {
           "vendor": "Walmart",
           "url": "https://www.walmart.com/ip/10535134",
-          "enabled": true,
+          "enabled": false,
           "package_count": 6,
           "unit_size": 16.9,
           "selectors": [
             "[itemprop='price']",
             ".price-characteristic",
             "[data-testid='price']"
-          ]
-        }
-      ]
-    },
-    {
-      "name": "Coke Zero Sugar Cherry 12pk/12oz cans",
-      "unit_type": "oz",
-      "vendors": [
-        {
-          "vendor": "Amazon",
-          "url": "https://www.amazon.com/dp/B000OV4FXI",
-          "enabled": true,
-          "package_count": 12,
-          "unit_size": 12,
-          "selectors": [
-            ".a-price .a-offscreen",
-            "#priceblock_ourprice",
-            "#priceblock_dealprice"
-          ]
-        },
-        {
-          "vendor": "Target",
-          "url": "https://www.target.com/p/-/A-12953312",
-          "enabled": true,
-          "package_count": 12,
-          "unit_size": 12,
-          "selectors": [
-            "[data-test='product-price']",
-            "[class*='currentPrice']"
-          ]
-        },
-        {
-          "vendor": "CVS",
-          "url": "https://www.cvs.com/shop/coca-cola-zero-sugar-cherry-soda-soft-drink-fridge-pack-cans-12-ct-12-oz-prodid-418486",
-          "enabled": true,
-          "package_count": 12,
-          "unit_size": 12,
-          "selectors": [
-            "[data-testid='price-value']",
-            "[class*='CurrentPrice']",
-            ".price__val"
-          ]
-        },
-        {
-          "vendor": "Safeway",
-          "url": "https://www.safeway.com/shop/product-details.108010408.html",
-          "enabled": true,
-          "package_count": 12,
-          "unit_size": 12,
-          "selectors": [
-            "[data-testid='price']",
-            ".product-price__saleprice",
-            "[class*='product-price']"
-          ]
-        },
-        {
-          "vendor": "Walmart",
-          "url": "https://www.walmart.com/ip/576336690",
-          "enabled": true,
-          "package_count": 12,
-          "unit_size": 12,
-          "selectors": [
-            "[itemprop='price']",
-            ".price-characteristic",
-            "[data-testid='price']"
-          ]
-        }
-      ]
-    },
-    {
-      "name": "Coke Zero Sugar Cherry 6pk/16.9oz bottles",
-      "unit_type": "oz",
-      "vendors": [
-        {
-          "vendor": "Amazon",
-          "url": "https://www.amazon.com/dp/B08LXL3465",
-          "enabled": true,
-          "package_count": 6,
-          "unit_size": 16.9,
-          "selectors": [
-            ".a-price .a-offscreen",
-            "#priceblock_ourprice",
-            "#priceblock_dealprice"
-          ]
-        },
-        {
-          "vendor": "CVS",
-          "url": "https://www.cvs.com/shop/coca-cola-cherry-zero-bottles-16-9-fl-oz-6-pack-prodid-126508",
-          "enabled": true,
-          "package_count": 6,
-          "unit_size": 16.9,
-          "selectors": [
-            "[data-testid='price-value']",
-            "[class*='CurrentPrice']",
-            ".price__val"
-          ]
-        },
-        {
-          "vendor": "Safeway",
-          "url": "https://www.safeway.com/shop/product-details.970022806.html",
-          "enabled": true,
-          "package_count": 6,
-          "unit_size": 16.9,
-          "selectors": [
-            "[data-testid='price']",
-            ".product-price__saleprice",
-            "[class*='product-price']"
-          ]
-        },
-        {
-          "vendor": "Walmart",
-          "url": "https://www.walmart.com/ip/871924816",
-          "enabled": true,
-          "package_count": 6,
-          "unit_size": 16.9,
-          "selectors": [
-            "[itemprop='price']",
-            ".price-characteristic",
-            "[data-testid='price']"
-          ]
+          ],
+          "_note": "Disabled pending investigation of Playwright fingerprinting vs. Walmart bot detection. Re-enable after lockout clears."
         }
       ]
     },
@@ -303,8 +188,8 @@
           "package_count": 12,
           "unit_size": 12,
           "selectors": [
-            "[data-testid='price']",
             ".product__price",
+            "[data-testid='price']",
             ".pricingInfo__price"
           ]
         },
@@ -323,14 +208,15 @@
         {
           "vendor": "Walmart",
           "url": "https://www.walmart.com/ip/711358875",
-          "enabled": true,
+          "enabled": false,
           "package_count": 12,
           "unit_size": 12,
           "selectors": [
             "[itemprop='price']",
             ".price-characteristic",
             "[data-testid='price']"
-          ]
+          ],
+          "_note": "Disabled pending investigation of Playwright fingerprinting vs. Walmart bot detection. Re-enable after lockout clears."
         }
       ]
     },
@@ -341,14 +227,15 @@
         {
           "vendor": "Walmart",
           "url": "https://www.walmart.com/ip/13812835",
-          "enabled": true,
+          "enabled": false,
           "package_count": 24,
           "unit_size": 12,
           "selectors": [
             "[itemprop='price']",
             ".price-characteristic",
             "[data-testid='price']"
-          ]
+          ],
+          "_note": "Disabled pending investigation of Playwright fingerprinting vs. Walmart bot detection. Re-enable after lockout clears."
         }
       ]
     },
@@ -386,8 +273,8 @@
           "package_count": 6,
           "unit_size": 16.9,
           "selectors": [
-            "[data-testid='price']",
             ".product__price",
+            "[data-testid='price']",
             ".pricingInfo__price"
           ]
         },
@@ -406,14 +293,15 @@
         {
           "vendor": "Walmart",
           "url": "https://www.walmart.com/ip/20435149",
-          "enabled": true,
+          "enabled": false,
           "package_count": 6,
           "unit_size": 16.9,
           "selectors": [
             "[itemprop='price']",
             ".price-characteristic",
             "[data-testid='price']"
-          ]
+          ],
+          "_note": "Disabled pending investigation of Playwright fingerprinting vs. Walmart bot detection. Re-enable after lockout clears."
         }
       ]
     }

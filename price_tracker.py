@@ -16,8 +16,10 @@ import os
 import re
 import subprocess
 import sys
+import time
 from datetime import datetime, timezone
 from pathlib import Path
+from urllib.parse import urlparse
 
 ROOT = Path(__file__).resolve().parent
 
@@ -126,36 +128,43 @@ def _walk_jsonld_for_price(node):
     return None
 
 
-def wait_for_price_element(page, selectors, timeout_ms=10000):
+def wait_for_price_element(page, selectors, timeout_ms=5000):
     """Wait for any CSS selector to appear in the DOM before extracting.
 
-    Retail pages that render prices via JS (e.g. Target/React) won't have the
-    price element present at domcontentloaded. Waiting here gives the page time
-    to render it. Silently continues on timeout — extraction will fail gracefully.
+    Combines all selectors into a single CSS query so the wait uses one shared
+    timeout rather than N × timeout sequential attempts. Silently continues on
+    timeout — extraction will fail gracefully.
     """
-    for selector in selectors or []:
-        try:
-            page.wait_for_selector(selector, timeout=timeout_ms, state="attached")
-            return  # one visible selector is enough
-        except Exception:
-            continue
+    if not selectors:
+        return
+    combined = ", ".join(selectors)
+    try:
+        page.wait_for_selector(combined, timeout=timeout_ms, state="attached")
+    except Exception:
+        pass
 
 
 def extract_jsonld_price(page):
-    """Try structured data first — most reliable on retail pages."""
+    """Try structured data first — most reliable on retail pages.
+
+    Returns (price, found_any, parsed_blocks). parsed_blocks is populated only
+    when JSON-LD was present but no price was found — used for diagnostics.
+    """
     blocks = page.locator("script[type='application/ld+json']").all()
     found_any = False
+    parsed_blocks = []
     for block in blocks:
         found_any = True
-        raw = block.inner_text()
+        raw = block.text_content()  # inner_text() returns empty on <script> tags
         try:
             data = json.loads(raw)
         except (json.JSONDecodeError, ValueError):
             continue
+        parsed_blocks.append(data)
         price = _walk_jsonld_for_price(data)
         if price is not None:
-            return normalize_price(price), found_any
-    return None, found_any
+            return normalize_price(price), found_any, []
+    return None, found_any, parsed_blocks
 
 
 def extract_css_price(page, selectors):
@@ -178,7 +187,7 @@ def extract_css_price(page, selectors):
     return None, None, last_raw
 
 
-def build_error(stage, message, vendor, page=None, jsonld_present=None, raw_text=None):
+def build_error(stage, message, vendor, page=None, jsonld_present=None, raw_text=None, jsonld_blocks=None):
     """Structured, debuggable error record — designed so Claude Code can fix a
     drifted selector from status.json alone."""
     err = {
@@ -186,6 +195,7 @@ def build_error(stage, message, vendor, page=None, jsonld_present=None, raw_text
         "message": message,
         "selectors_tried": vendor.get("selectors", []),
         "jsonld_present": jsonld_present,
+        "jsonld_blocks": jsonld_blocks or [],
         "page_title": None,
         "final_url": None,
         "raw_text": raw_text,
@@ -236,7 +246,7 @@ def process_vendor(page, product, unit_type, vendor, config, history):
     # Give JS-rendered prices time to appear before extracting.
     wait_for_price_element(page, vendor.get("selectors"))
 
-    price, jsonld_present = extract_jsonld_price(page)
+    price, jsonld_present, jsonld_blocks = extract_jsonld_price(page)
     raw_text = None
     if price is None:
         price, _matched, raw_text = extract_css_price(page, vendor.get("selectors"))
@@ -254,7 +264,7 @@ def process_vendor(page, product, unit_type, vendor, config, history):
         else:
             stage = "extraction"
             message = "No JSON-LD price and every CSS selector missed"
-        result["error"] = build_error(stage, message, vendor, page, jsonld_present, raw_text)
+        result["error"] = build_error(stage, message, vendor, page, jsonld_present, raw_text, jsonld_blocks)
         return result
 
     total_base_units = package_count * unit_size
@@ -361,6 +371,8 @@ def main():
     user_data_dir = os.path.expanduser(config.get("user_data_dir", "~/.price-tracker/brave-profile"))
     executable = os.path.expanduser(config.get("brave_executable", ""))
     profile_directory = config.get("profile_directory", "Default")
+    request_delay = config.get("request_delay_ms", 2000) / 1000
+    same_domain_delay = config.get("same_domain_delay_ms", 4000) / 1000
 
     results = []
     timestamp = datetime.now(timezone.utc).isoformat()
@@ -373,14 +385,38 @@ def main():
                 user_data_dir=user_data_dir,
                 executable_path=executable,
                 headless=config.get("headless", False),
-                args=[f"--profile-directory={profile_directory}"],
+                args=[
+                    f"--profile-directory={profile_directory}",
+                    # Remove the navigator.webdriver flag that bot detectors
+                    # (e.g. Walmart) use to identify Playwright-controlled browsers.
+                    "--disable-blink-features=AutomationControlled",
+                ],
             )
+            # Belt-and-suspenders: mask webdriver via init script as well.
+            context.add_init_script(
+                "Object.defineProperty(navigator, 'webdriver', {get: () => undefined});"
+            )
+            # Close any tabs Brave restored from the previous session so they
+            # don't linger as stranded windows after the run.
+            for existing in context.pages:
+                try:
+                    existing.close()
+                except Exception:
+                    pass
             page = context.new_page()
+            last_domain = None
             for product in products:
                 unit_type = product.get("unit_type", "unit")
                 for vendor in product.get("vendors", []):
                     if not vendor.get("enabled", True):
                         continue
+                    # Pace requests: longer delay when hitting the same domain
+                    # back-to-back to reduce bot-detection accumulation.
+                    domain = urlparse(vendor["url"]).netloc
+                    delay = same_domain_delay if domain == last_domain else request_delay
+                    if last_domain is not None:
+                        time.sleep(delay)
+                    last_domain = domain
                     try:
                         r = process_vendor(page, product["name"], unit_type, vendor, config, history)
                     except Exception as e:  # one bad vendor never aborts the run
