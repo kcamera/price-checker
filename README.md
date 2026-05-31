@@ -8,13 +8,12 @@ drops below your threshold.
 No AI inference at runtime, no cloud service, no daemon — it's a fixed script that produces
 the same result every run. You run it yourself when you want to know.
 
-## Why Brave + a dedicated profile
+## Why Brave + your personal profile
 
 Retail sites block obvious bots. To look like a normal shopper, the tool drives your
-day-to-day **Brave** browser (headful) rather than a stock headless Chromium. It uses a
-**dedicated Brave profile** reserved for this tool, kept separate from your personal browsing
-so its cookies/trackers don't mix with yours — and so it doesn't collide with a Brave window
-you already have open.
+day-to-day **Brave** browser (headful) using your **real personal profile** — the one with
+your actual browsing history, cookies, and fingerprint. This is what gets past the aggressive
+bot detection on sites like Walmart.
 
 ## Prerequisites
 
@@ -29,17 +28,22 @@ You also need Brave installed. On macOS the executable is:
 /Applications/Brave Browser.app/Contents/MacOS/Brave Browser
 ```
 
-### Dedicated profile setup
+### Profile setup
 
 `vendors.json` → `config` controls the browser:
 
 - `brave_executable` — path to the Brave binary (above).
-- `user_data_dir` — a **dedicated** directory for this tool's profile, e.g.
-  `~/.price-tracker/brave-profile`. Created on first run. Do **not** point this at your
-  personal Brave data dir (that would mix cookies and can fail with a profile-lock error if
-  Brave is already open).
+- `user_data_dir` — your real Brave user data directory:
+  `~/Library/Application Support/BraveSoftware/Brave-Browser`
 - `profile_directory` — the profile within that data dir (default `Default`).
 - `headless` — keep `false`; a visible browser is more blocker-resistant.
+
+### Important: close Brave before running
+
+Chromium locks its user-data-dir at the process level. If Brave is already open when
+you trigger the tracker, the script will detect this and exit immediately with a clear
+message — no cryptic crash. Just close Brave, run the script, then reopen Brave when
+it's done.
 
 ## Usage
 

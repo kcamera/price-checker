@@ -14,11 +14,38 @@ Exit codes: 0 = all vendors succeeded, 1 = one or more fetch/parse failures,
 import json
 import os
 import re
+import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
+
+
+# --- preflight -------------------------------------------------------------
+
+def check_brave_not_running():
+    """Exit with a clear message if Brave is already open.
+
+    Playwright uses launch_persistent_context against the real Brave user-data-dir.
+    Chromium locks that directory at the process level, so a second instance
+    pointing at the same dir will fail immediately. The friendly fix is to just
+    close Brave first.
+    """
+    try:
+        result = subprocess.run(
+            ["pgrep", "-x", "Brave Browser"],
+            capture_output=True,
+        )
+        if result.returncode == 0:
+            print(
+                "Brave is currently open. Close Brave before running the price tracker,\n"
+                "then try again. (The tracker needs exclusive access to your profile.)",
+                file=sys.stderr,
+            )
+            sys.exit(2)
+    except FileNotFoundError:
+        pass  # pgrep not available — proceed and let Playwright surface any lock error
 VENDORS_FILE = ROOT / "vendors.json"
 HISTORY_FILE = ROOT / "price_history.json"
 STATUS_FILE = ROOT / "status.json"
@@ -291,6 +318,8 @@ def print_summary(results, exit_code):
 # --- main ------------------------------------------------------------------
 
 def main():
+    check_brave_not_running()
+
     try:
         config_doc = load_config()
     except (OSError, json.JSONDecodeError) as e:

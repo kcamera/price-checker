@@ -1,7 +1,7 @@
 {
   "config": {
     "brave_executable": "/Applications/Brave Browser.app/Contents/MacOS/Brave Browser",
-    "user_data_dir": "~/.price-tracker/brave-profile",
+    "user_data_dir": "~/Library/Application Support/BraveSoftware/Brave-Browser",
     "profile_directory": "Default",
     "headless": false,
     "alert_threshold_pct": 5.0,
@@ -9,19 +9,410 @@
   },
   "products": [
     {
-      "name": "Example Sparkling Water",
+      "name": "Coke Zero Sugar 12pk/12oz cans",
       "unit_type": "oz",
       "vendors": [
         {
-          "vendor": "ExampleMart",
-          "url": "https://example.com/REPLACE-WITH-REAL-PRODUCT-URL",
+          "vendor": "Amazon",
+          "url": "https://www.amazon.com/dp/B000OV0S84",
+          "enabled": true,
+          "package_count": 12,
+          "unit_size": 12,
+          "selectors": [
+            ".a-price .a-offscreen",
+            "#priceblock_ourprice",
+            "#priceblock_dealprice"
+          ]
+        },
+        {
+          "vendor": "Target",
+          "url": "https://www.target.com/p/-/A-12958789",
+          "enabled": true,
+          "package_count": 12,
+          "unit_size": 12,
+          "selectors": [
+            "[data-test='product-price']",
+            "[class*='currentPrice']"
+          ]
+        },
+        {
+          "vendor": "CVS",
+          "url": "https://www.cvs.com/shop/coke-zero-sugar-diet-soda-soft-drink-cans-12-ct-12-oz-prodid-1190778",
+          "enabled": true,
+          "package_count": 12,
+          "unit_size": 12,
+          "selectors": [
+            "[data-testid='price-value']",
+            "[class*='CurrentPrice']",
+            ".price__val"
+          ]
+        },
+        {
+          "vendor": "Walgreens",
+          "url": "https://www.walgreens.com/store/c/coca-cola-zero-sugar,-fridge-pack-cola,-12-pack/ID=prod6061768-product",
+          "enabled": true,
+          "package_count": 12,
+          "unit_size": 12,
+          "selectors": [
+            "[data-testid='price']",
+            ".product__price",
+            ".pricingInfo__price"
+          ]
+        },
+        {
+          "vendor": "Safeway",
+          "url": "https://www.safeway.com/shop/product-details.108010505.html",
+          "enabled": true,
+          "package_count": 12,
+          "unit_size": 12,
+          "selectors": [
+            "[data-testid='price']",
+            ".product-price__saleprice",
+            "[class*='product-price']"
+          ]
+        },
+        {
+          "vendor": "Walmart",
+          "url": "https://www.walmart.com/ip/10291651",
           "enabled": true,
           "package_count": 12,
           "unit_size": 12,
           "selectors": [
             "[itemprop='price']",
-            ".price-now",
-            ".product-price"
+            ".price-characteristic",
+            "[data-testid='price']"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Coke Zero Sugar 6pk/16.9oz bottles",
+      "unit_type": "oz",
+      "vendors": [
+        {
+          "vendor": "Amazon",
+          "url": "https://www.amazon.com/dp/B00FU1YIEI",
+          "enabled": true,
+          "package_count": 6,
+          "unit_size": 16.9,
+          "selectors": [
+            ".a-price .a-offscreen",
+            "#priceblock_ourprice",
+            "#priceblock_dealprice"
+          ]
+        },
+        {
+          "vendor": "Target",
+          "url": "https://www.target.com/p/-/A-12953311",
+          "enabled": true,
+          "package_count": 6,
+          "unit_size": 16.9,
+          "selectors": [
+            "[data-test='product-price']",
+            "[class*='currentPrice']"
+          ]
+        },
+        {
+          "vendor": "Walgreens",
+          "url": "https://www.walgreens.com/store/c/coca-cola-zero-sugar-cola-6-pack-bottle/ID=prod6124569-product",
+          "enabled": true,
+          "package_count": 6,
+          "unit_size": 16.9,
+          "selectors": [
+            "[data-testid='price']",
+            ".product__price",
+            ".pricingInfo__price"
+          ]
+        },
+        {
+          "vendor": "Safeway",
+          "url": "https://www.safeway.com/shop/product-details.108010730.html",
+          "enabled": true,
+          "package_count": 6,
+          "unit_size": 16.9,
+          "selectors": [
+            "[data-testid='price']",
+            ".product-price__saleprice",
+            "[class*='product-price']"
+          ]
+        },
+        {
+          "vendor": "Walmart",
+          "url": "https://www.walmart.com/ip/10535134",
+          "enabled": true,
+          "package_count": 6,
+          "unit_size": 16.9,
+          "selectors": [
+            "[itemprop='price']",
+            ".price-characteristic",
+            "[data-testid='price']"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Coke Zero Sugar Cherry 12pk/12oz cans",
+      "unit_type": "oz",
+      "vendors": [
+        {
+          "vendor": "Amazon",
+          "url": "https://www.amazon.com/dp/B000OV4FXI",
+          "enabled": true,
+          "package_count": 12,
+          "unit_size": 12,
+          "selectors": [
+            ".a-price .a-offscreen",
+            "#priceblock_ourprice",
+            "#priceblock_dealprice"
+          ]
+        },
+        {
+          "vendor": "Target",
+          "url": "https://www.target.com/p/-/A-12953312",
+          "enabled": true,
+          "package_count": 12,
+          "unit_size": 12,
+          "selectors": [
+            "[data-test='product-price']",
+            "[class*='currentPrice']"
+          ]
+        },
+        {
+          "vendor": "CVS",
+          "url": "https://www.cvs.com/shop/coca-cola-zero-sugar-cherry-soda-soft-drink-fridge-pack-cans-12-ct-12-oz-prodid-418486",
+          "enabled": true,
+          "package_count": 12,
+          "unit_size": 12,
+          "selectors": [
+            "[data-testid='price-value']",
+            "[class*='CurrentPrice']",
+            ".price__val"
+          ]
+        },
+        {
+          "vendor": "Safeway",
+          "url": "https://www.safeway.com/shop/product-details.108010408.html",
+          "enabled": true,
+          "package_count": 12,
+          "unit_size": 12,
+          "selectors": [
+            "[data-testid='price']",
+            ".product-price__saleprice",
+            "[class*='product-price']"
+          ]
+        },
+        {
+          "vendor": "Walmart",
+          "url": "https://www.walmart.com/ip/576336690",
+          "enabled": true,
+          "package_count": 12,
+          "unit_size": 12,
+          "selectors": [
+            "[itemprop='price']",
+            ".price-characteristic",
+            "[data-testid='price']"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Coke Zero Sugar Cherry 6pk/16.9oz bottles",
+      "unit_type": "oz",
+      "vendors": [
+        {
+          "vendor": "Amazon",
+          "url": "https://www.amazon.com/dp/B08LXL3465",
+          "enabled": true,
+          "package_count": 6,
+          "unit_size": 16.9,
+          "selectors": [
+            ".a-price .a-offscreen",
+            "#priceblock_ourprice",
+            "#priceblock_dealprice"
+          ]
+        },
+        {
+          "vendor": "CVS",
+          "url": "https://www.cvs.com/shop/coca-cola-cherry-zero-bottles-16-9-fl-oz-6-pack-prodid-126508",
+          "enabled": true,
+          "package_count": 6,
+          "unit_size": 16.9,
+          "selectors": [
+            "[data-testid='price-value']",
+            "[class*='CurrentPrice']",
+            ".price__val"
+          ]
+        },
+        {
+          "vendor": "Safeway",
+          "url": "https://www.safeway.com/shop/product-details.970022806.html",
+          "enabled": true,
+          "package_count": 6,
+          "unit_size": 16.9,
+          "selectors": [
+            "[data-testid='price']",
+            ".product-price__saleprice",
+            "[class*='product-price']"
+          ]
+        },
+        {
+          "vendor": "Walmart",
+          "url": "https://www.walmart.com/ip/871924816",
+          "enabled": true,
+          "package_count": 6,
+          "unit_size": 16.9,
+          "selectors": [
+            "[itemprop='price']",
+            ".price-characteristic",
+            "[data-testid='price']"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Pepsi Zero Sugar 12pk/12oz cans",
+      "unit_type": "oz",
+      "vendors": [
+        {
+          "vendor": "Amazon",
+          "url": "https://www.amazon.com/dp/B001E6UUKE",
+          "enabled": true,
+          "package_count": 12,
+          "unit_size": 12,
+          "selectors": [
+            ".a-price .a-offscreen",
+            "#priceblock_ourprice",
+            "#priceblock_dealprice"
+          ]
+        },
+        {
+          "vendor": "Target",
+          "url": "https://www.target.com/p/-/A-12946208",
+          "enabled": true,
+          "package_count": 12,
+          "unit_size": 12,
+          "selectors": [
+            "[data-test='product-price']",
+            "[class*='currentPrice']"
+          ]
+        },
+        {
+          "vendor": "Walgreens",
+          "url": "https://www.walgreens.com/store/c/pepsi-zero-sugar-soda-cola,-12-pack/ID=prod6006689-product",
+          "enabled": true,
+          "package_count": 12,
+          "unit_size": 12,
+          "selectors": [
+            "[data-testid='price']",
+            ".product__price",
+            ".pricingInfo__price"
+          ]
+        },
+        {
+          "vendor": "Safeway",
+          "url": "https://www.safeway.com/shop/product-details.108010676.html",
+          "enabled": true,
+          "package_count": 12,
+          "unit_size": 12,
+          "selectors": [
+            "[data-testid='price']",
+            ".product-price__saleprice",
+            "[class*='product-price']"
+          ]
+        },
+        {
+          "vendor": "Walmart",
+          "url": "https://www.walmart.com/ip/711358875",
+          "enabled": true,
+          "package_count": 12,
+          "unit_size": 12,
+          "selectors": [
+            "[itemprop='price']",
+            ".price-characteristic",
+            "[data-testid='price']"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Coke Zero Sugar 24pk/12oz cans",
+      "unit_type": "oz",
+      "vendors": [
+        {
+          "vendor": "Walmart",
+          "url": "https://www.walmart.com/ip/13812835",
+          "enabled": true,
+          "package_count": 24,
+          "unit_size": 12,
+          "selectors": [
+            "[itemprop='price']",
+            ".price-characteristic",
+            "[data-testid='price']"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Pepsi Zero Sugar 6pk/16.9oz bottles",
+      "unit_type": "oz",
+      "vendors": [
+        {
+          "vendor": "Amazon",
+          "url": "https://www.amazon.com/dp/B00FFJ0ARO",
+          "enabled": true,
+          "package_count": 6,
+          "unit_size": 16.9,
+          "selectors": [
+            ".a-price .a-offscreen",
+            "#priceblock_ourprice",
+            "#priceblock_dealprice"
+          ]
+        },
+        {
+          "vendor": "Target",
+          "url": "https://www.target.com/p/-/A-47098147",
+          "enabled": true,
+          "package_count": 6,
+          "unit_size": 16.9,
+          "selectors": [
+            "[data-test='product-price']",
+            "[class*='currentPrice']"
+          ]
+        },
+        {
+          "vendor": "Walgreens",
+          "url": "https://www.walgreens.com/store/c/pepsi-zero-sugar-soda-cola,-6-pack-bottle/ID=300436722-product",
+          "enabled": true,
+          "package_count": 6,
+          "unit_size": 16.9,
+          "selectors": [
+            "[data-testid='price']",
+            ".product__price",
+            ".pricingInfo__price"
+          ]
+        },
+        {
+          "vendor": "Safeway",
+          "url": "https://www.safeway.com/shop/product-details.960048938.html",
+          "enabled": true,
+          "package_count": 6,
+          "unit_size": 16.9,
+          "selectors": [
+            "[data-testid='price']",
+            ".product-price__saleprice",
+            "[class*='product-price']"
+          ]
+        },
+        {
+          "vendor": "Walmart",
+          "url": "https://www.walmart.com/ip/20435149",
+          "enabled": true,
+          "package_count": 6,
+          "unit_size": 16.9,
+          "selectors": [
+            "[itemprop='price']",
+            ".price-characteristic",
+            "[data-testid='price']"
           ]
         }
       ]
