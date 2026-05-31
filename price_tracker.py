@@ -115,16 +115,44 @@ def extract_jsonld_price(page):
 
 
 def extract_css_price(page, selectors):
-    """Try each CSS selector in order; first that parses to a number wins."""
+    """Try each CSS selector in order; first that parses to a number wins.
+
+    Returns (price, matched_selector, last_unparsable_text). The third value is
+    the raw text of a selector that *did* match an element but whose text would
+    not normalize to a number — used to report a `parse`-stage failure.
+    """
+    last_raw = None
     for selector in selectors or []:
         loc = page.locator(selector).first
         if loc.count() == 0:
             continue
         text = loc.inner_text(timeout=2000)
+        last_raw = text
         price = normalize_price(text)
         if price is not None:
-            return price, selector
-    return None, None
+            return price, selector, None
+    return None, None, last_raw
+
+
+def build_error(stage, message, vendor, page=None, jsonld_present=None, raw_text=None):
+    """Structured, debuggable error record — designed so Claude Code can fix a
+    drifted selector from status.json alone."""
+    err = {
+        "stage": stage,
+        "message": message,
+        "selectors_tried": vendor.get("selectors", []),
+        "jsonld_present": jsonld_present,
+        "page_title": None,
+        "final_url": None,
+        "raw_text": raw_text,
+    }
+    if page is not None:
+        try:
+            err["page_title"] = page.title()
+            err["final_url"] = page.url
+        except Exception:
+            pass
+    return err
 
 
 # --- per-vendor processing -------------------------------------------------
@@ -153,14 +181,25 @@ def process_vendor(page, product, unit_type, vendor, config, history):
         "error": None,
     }
 
-    page.goto(url, timeout=config.get("nav_timeout_ms", 30000), wait_until="domcontentloaded")
+    try:
+        page.goto(url, timeout=config.get("nav_timeout_ms", 30000), wait_until="domcontentloaded")
+    except Exception as e:
+        result["error"] = build_error("navigation", str(e), vendor, page)
+        return result
 
-    price, _jsonld_present = extract_jsonld_price(page)
+    price, jsonld_present = extract_jsonld_price(page)
+    raw_text = None
     if price is None:
-        price, _matched = extract_css_price(page, vendor.get("selectors"))
+        price, _matched, raw_text = extract_css_price(page, vendor.get("selectors"))
 
     if price is None:
-        result["error"] = "Could not extract a price (JSON-LD and all selectors missed)"
+        if raw_text:
+            stage = "parse"
+            message = "Matched element text did not normalize to a number"
+        else:
+            stage = "extraction"
+            message = "No JSON-LD price and every CSS selector missed"
+        result["error"] = build_error(stage, message, vendor, page, jsonld_present, raw_text)
         return result
 
     total_base_units = package_count * unit_size
@@ -295,7 +334,8 @@ def main():
                             "package_count": vendor.get("package_count", 1),
                             "unit_size": vendor.get("unit_size", 1),
                             "prev_price": None, "prev_price_per_base_unit": None,
-                            "change_pct": None, "alert": False, "error": str(e),
+                            "change_pct": None, "alert": False,
+                            "error": build_error("runtime", str(e), vendor, page),
                         }
                     if r["ok"]:
                         append_history(history, r, timestamp)
